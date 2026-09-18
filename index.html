@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html><head><meta name="GCD" content="YTk3ODQ3ZWZhN2I4NzZmMzBkNTEwYjJl056ab5da896ee8f216c5ef1dd3cbe5fe"/>
+<html><head><meta name="GCD" content="YTk3ODQ3ZWZhN2I4NzZmMzBkNTEwYjJlf958b69c932cad80de2bc2408ac21fe8"/>
   <meta charset="utf-8">
   <meta name="generator" content="Google Web Designer 16.4.1.0219">
   <meta name="template" content="Banner 3.0.0">
@@ -137,7 +137,8 @@ set:function(a){this.g.height=a}},width:{configurable:!0,enumerable:!0,get:funct
       </gwd-page>
     </gwd-pagedeck>
   </gwd-genericad>
-  <script type="text/javascript" id="gwd-init-code">
+  
+ <script type="text/javascript" id="gwd-init-code">
     (function() {
       var gwdAd = document.getElementById('gwd-ad');
 
@@ -145,17 +146,10 @@ set:function(a){this.g.height=a}},width:{configurable:!0,enumerable:!0,get:funct
        * Handles the DOMContentLoaded event. The DOMContentLoaded event is
        * fired when the document has been completely loaded and parsed.
        */
-      function handleDomContentLoaded(event) {
-
-        // Intentionally do NOT hide/show the fallback here.
-        // Visibility is decided later after the location lookup.
-        // This avoids a visible flash on DOOH screens during initialization.
-
-        let calculationsComplete = false;
+              let isImageLoaded = false;
         let vioohReadySent = false;
-        let isFallbackMode = false;
 
-        function sendVioohReady() {
+      function sendVioohReady() {
           if (vioohReadySent) return;
           vioohReadySent = true;
           console.log("Creative sending Ready signal to VIOOH...");
@@ -163,6 +157,18 @@ set:function(a){this.g.height=a}},width:{configurable:!0,enumerable:!0,get:funct
             event: "viooh.ready"
           }, "*");
         }
+      
+      function handleDomContentLoaded(event) {
+
+        // Intentionally do NOT hide/show the fallback here.
+        // Visibility is decided later after the location lookup.
+        // This avoids a visible flash on DOOH screens during initialization.
+
+        let calculationsComplete = false;
+        let isFallbackMode = false;
+
+
+        
 
         function waitForImageAndSendReady() {
           const creativeElement = document.getElementById('Rhasidat_1_-_Co-op');
@@ -184,17 +190,17 @@ set:function(a){this.g.height=a}},width:{configurable:!0,enumerable:!0,get:funct
             imgLoader.decode()
               .then(function() {
                 console.log("Image 100% loaded and decoded into memory.");
-                sendVioohReady();
+                isImageLoaded=true;
               })
           } else {
             // Fallback for players without decode() support
             if (imgLoader.complete) {
               console.log("Image already complete in memory.");
-              sendVioohReady();
+              isImageLoaded=true;
             } else {
               imgLoader.onload = function() {
                 console.log("Image loaded successfully via onload.");
-                sendVioohReady();
+                isImageLoaded=true;
               };
             }
           }
@@ -315,6 +321,9 @@ set:function(a){this.g.height=a}},width:{configurable:!0,enumerable:!0,get:funct
           //gwdAd.initAd();
 
         }
+        
+
+        
         window.addEventListener('message', function(event) {
           if (event.data.event === 'viooh.play') {
             console.log("Creative received Play signal from VIOOH...");
@@ -333,11 +342,24 @@ set:function(a){this.g.height=a}},width:{configurable:!0,enumerable:!0,get:funct
         requestAnimationFrame(function() {
           setTimeout(function() {
             // GWD's original initialization line (keep this active)
-            //console.log("Init ad called");
+            console.log("Init ad called");
             gwdAd.initAd();
+            checkForImageLoaded();
           }, 1);
         });
       }
+      
+              function checkForImageLoaded() {
+
+    if (isImageLoaded == true) {
+        console.log("Image loaded. Calling fucntion sendVioohReady");
+        sendVioohReady();
+    } else {
+        console.log("Image not loaded yet. Checking again...");
+        setTimeout(checkForImageLoaded, 10);
+    }
+}
+      
 
       /**
        * Handles the event that is dispatched after the Ad has been
@@ -353,6 +375,7 @@ set:function(a){this.g.height=a}},width:{configurable:!0,enumerable:!0,get:funct
         handleAdInitialized, false);
     })();
   </script>
+  
   <script>
     //Location list data - Need to update as per Campaign
 
